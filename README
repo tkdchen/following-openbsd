@@ -1,0 +1,2 @@
+Updating OpenBSD system by following the current or stable method. Currently, only support the -current method.
+This script wraps the steps introduced by the OpenBSD FAQ, and provide more controls.
