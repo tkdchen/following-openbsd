@@ -1,6 +1,8 @@
 #!/bin/sh
 
 ANONCVS_MIRROR=anoncvs@anoncvs.jp.openbsd.org
+AUTOMATIC_REBOOT=F
+ACTION=unknown
 
 sync_src()
 {
@@ -69,63 +71,78 @@ build_xenocara()
 	make build
 }
 
-do_rest()
-{
-	build_binaries
-	build_xenocara
-}
-
 usage()
 {
 	cat <<EOF
-sys_update.sh target|help
+# sys_update.sh [options] action [targets]
 
-target:
-	sync [src|ports|X]
+Options:
+	-d Same as the -d option for CVS. Specify an anonmynous CVS mirror.
+	-r Reboot automatically after building kernel successfully.
+	   This only applies to the build of kernel.
+	   By default, anoncvs@anoncvs.jp.openbsd.org:/cvs is used because that
+	   it fast enough for me in Beijing, China.
+	-h Print this usage.
 
-		src:   sync /usr/src
-		ports: sync /usr/ports
-		X:	 sync /usr/xenocara
-		only sync means syncing all of above
+Actions:
+	sync	Synchronize the source tree.
+	build	build from the source tree to update the system.
 
-	kernel
+Targets:
+	For the sync action:
+	- src:   sync /usr/src
+	- ports: sync /usr/ports
+	- X:     sync /usr/xenocara
+    - all:   sync all of them in the order of src, ports and X
+
+	For the build action:
+	- kernel
 		build and install kernel. This requires to reboot machine.
-
-	binaries
+	- binaries
 		build and install binaries.
-
-	X
+	- X
 		build and install xenocara
-
-	rest
-		a shortcut to the binaries and X after rebooting machine.
-
-help:
-	print this help text.
+	You should pass them to the build action explicitly.
 EOF
 }
 
-case $1 in
-	"sync")
-		case $2 in
-		"src") sync_src ;;
-		"ports" ) sync_ports ;;
-		"X") sync_xenocara ;;
+while [ $# != 0 ]
+do
+    case $1 in
+        "-r") AUTOMATIC_REBOOT=T ;;
+        "-d")
+            shift
+            ANONCVS_MIRROR=$1
+            ;;
+        "-h")
+            usage
+            exit
+            ;;
+        "sync") ACTION=sync ;;
+        "build") ACTION=build ;;
 		*)
-			sync_src
-			sync_ports
-			sync_xenocara
-			;;
-		esac
-		;;
+			if [ "$ACTION" == "sync" ]
+			then
+				case $1 in
+					"src")   sync_src ;;
+					"ports") sync_ports ;;
+					"X")     sync_xenocara ;;
+                    "all")
+                        sync_src
+                        sync_ports
+                        sync_xenocara
+                        ;;
+				esac
+			fi
+			if [ "$ACTION" == "build" ]
+			then
+				case $1 in
+					"kernel")   build_kernel ;;
+					"binaries") build_binaries ;;
+					"X")        build_xenocara ;;
+				esac
+			fi
+    esac
+    shift
+done
 
-	"kernel") build_kernel ;;
-	"binaries") build_binaries ;;
-	"X") build_xenocara ;;
-	"help") usage ;;
-	*)
-		echo Unknown argument.
-		echo
-		usage
-		;;
-esac
