@@ -49,7 +49,13 @@ build_kernel()
 
 	cd /usr/src/sys/arch/i386/compile/GENERIC
 	make install
-	echo Now, you should reboot your machine.
+
+    if [ -n AUTOMATIC_REBOOT -a "$AUTOMATIC_REBOOT" == "T" ]
+    then
+        reboot
+    else
+    	echo Now, you should reboot your machine manually.
+    fi
 }
 
 build_binaries()
