@@ -115,12 +115,14 @@ EOF
 while [ $# != 0 ]
 do
     case $1 in
-        "-r") AUTOMATIC_REBOOT=T ;;
-        "-d")
+        "-r" | "--reboot")
+            AUTOMATIC_REBOOT=T
+            ;;
+        "-d" | "--anoncvs-mirror")
             shift
             ANONCVS_MIRROR=$1
             ;;
-        "-h")
+        "-h" | "--help")
             usage
             exit
             ;;
