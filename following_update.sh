@@ -129,27 +129,28 @@ do
         "sync") ACTION=sync ;;
         "build") ACTION=build ;;
         *)
-            if [ "$ACTION" == "sync" ]
-            then
-                case $1 in
-                    "src")   sync_src ;;
-                    "ports") sync_ports ;;
-                    "X")     sync_xenocara ;;
-                    "all")
-                        sync_src
-                        sync_ports
-                        sync_xenocara
-                        ;;
-                esac
-            fi
-            if [ "$ACTION" == "build" ]
-            then
-                case $1 in
-                    "kernel")   build_kernel ;;
-                    "binaries") build_binaries ;;
-                    "X")        build_xenocara ;;
-                esac
-            fi
+            case $ACTION in
+                "sync")
+                    case $1 in
+                        "src")   sync_src ;;
+                        "ports") sync_ports ;;
+                        "X")     sync_xenocara ;;
+                        "all")
+                            sync_src
+                            sync_ports
+                            sync_xenocara
+                            ;;
+                    esac
+                    ;;
+
+                "build")
+                    case $1 in
+                        "kernel")   build_kernel ;;
+                        "binaries") build_binaries ;;
+                        "X")        build_xenocara ;;
+                    esac
+                    ;;
+            esac
     esac
     shift
 done
