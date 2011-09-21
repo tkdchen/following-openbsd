@@ -42,12 +42,12 @@ sync_xenocara()
 
 build_kernel()
 {
-    cd /usr/src/sys/arch/i386/conf
+    cd /usr/src/sys/arch/`machine -a`/conf
     /usr/sbin/config GENERIC
-    cd /usr/src/sys/arch/i386/compile/GENERIC
+    cd /usr/src/sys/arch/`machine -a`/compile/GENERIC
     make clean && make depend && make
 
-    cd /usr/src/sys/arch/i386/compile/GENERIC
+    cd /usr/src/sys/arch/`machine -a`/compile/GENERIC
     make install
 
     if [ -n AUTOMATIC_REBOOT -a "$AUTOMATIC_REBOOT" == "T" ]
